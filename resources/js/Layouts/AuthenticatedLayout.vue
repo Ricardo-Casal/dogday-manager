@@ -47,6 +47,9 @@ const showingNavigationDropdown = ref(false);
                                     <NavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">
                                         Preços
                                     </NavLink>
+                                    <NavLink :href="route('staff.users.index')" :active="route().current('staff.users.*')">
+                                        Utilizadores
+                                    </NavLink>
                                 </template>
                                 <!-- Owner nav -->
                                 <template v-else>
@@ -163,6 +166,7 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('owners.index')" :active="route().current('owners.*')">Donos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">Pedidos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">Preços</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('staff.users.index')" :active="route().current('staff.users.*')">Utilizadores</ResponsiveNavLink>
                         </template>
                         <template v-else>
                             <ResponsiveNavLink :href="route('owner.dashboard')" :active="route().current('owner.dashboard')">A minha área</ResponsiveNavLink>

@@ -8,6 +8,7 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staff\BookingController as StaffBookingController;
 use App\Http\Controllers\Staff\SettingController;
+use App\Http\Controllers\Staff\UserController as StaffUserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +30,11 @@ Route::middleware(['auth', 'verified', 'staff'])->group(function () {
 
     Route::get('/staff/settings', [SettingController::class, 'index'])->name('staff.settings.index');
     Route::patch('/staff/settings/{setting}', [SettingController::class, 'update'])->name('staff.settings.update');
+
+    Route::get('/staff/users', [StaffUserController::class, 'index'])->name('staff.users.index');
+    Route::get('/staff/users/create', [StaffUserController::class, 'create'])->name('staff.users.create');
+    Route::post('/staff/users', [StaffUserController::class, 'store'])->name('staff.users.store');
+    Route::delete('/staff/users/{user}', [StaffUserController::class, 'destroy'])->name('staff.users.destroy');
 });
 
 // Owner routes
