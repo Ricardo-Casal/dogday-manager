@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingStatusUpdated;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,6 +32,13 @@ class BookingController extends Controller
         ]);
 
         $booking->update($validated);
+        $booking->load('dog', 'owner');
+
+        $email = $booking->owner->email ?? $booking->owner->user?->email;
+
+        if ($email) {
+            Mail::to($email)->send(new BookingStatusUpdated($booking));
+        }
 
         return back();
     }
