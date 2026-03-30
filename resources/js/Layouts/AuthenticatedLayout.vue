@@ -33,18 +33,30 @@ const showingNavigationDropdown = ref(false);
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
                             >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    :href="route('owners.index')"
-                                    :active="route().current('owners.*')"
-                                >
-                                    Donos
-                                </NavLink>
+                                <!-- Staff nav -->
+                                <template v-if="$page.props.auth.role === 'staff'">
+                                    <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                        Dashboard
+                                    </NavLink>
+                                    <NavLink :href="route('owners.index')" :active="route().current('owners.*')">
+                                        Donos
+                                    </NavLink>
+                                    <NavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">
+                                        Pedidos
+                                    </NavLink>
+                                    <NavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">
+                                        Preços
+                                    </NavLink>
+                                </template>
+                                <!-- Owner nav -->
+                                <template v-else>
+                                    <NavLink :href="route('owner.dashboard')" :active="route().current('owner.dashboard')">
+                                        A minha área
+                                    </NavLink>
+                                    <NavLink :href="route('owner.bookings.create')" :active="route().current('owner.bookings.*')">
+                                        Novo Pedido
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
@@ -146,18 +158,16 @@ const showingNavigationDropdown = ref(false);
                     class="sm:hidden"
                 >
                     <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            :href="route('owners.index')"
-                            :active="route().current('owners.*')"
-                        >
-                            Donos
-                        </ResponsiveNavLink>
+                        <template v-if="$page.props.auth.role === 'staff'">
+                            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Dashboard</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('owners.index')" :active="route().current('owners.*')">Donos</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">Pedidos</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">Preços</ResponsiveNavLink>
+                        </template>
+                        <template v-else>
+                            <ResponsiveNavLink :href="route('owner.dashboard')" :active="route().current('owner.dashboard')">A minha área</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('owner.bookings.create')" :active="route().current('owner.bookings.*')">Novo Pedido</ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->

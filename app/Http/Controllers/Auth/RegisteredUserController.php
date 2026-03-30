@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Owner;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -41,12 +42,23 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'owner',
         ]);
+
+        // Link to existing owner record by email, or create a new one
+        $owner = Owner::firstOrCreate(
+            ['email' => $request->email],
+            ['name' => $request->name, 'user_id' => $user->id]
+        );
+
+        if (!$owner->user_id) {
+            $owner->update(['user_id' => $user->id]);
+        }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('owner.dashboard', absolute: false));
     }
 }
