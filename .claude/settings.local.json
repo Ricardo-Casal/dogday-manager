@@ -8,7 +8,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(gh api:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(gh repo:*)",
+      "Bash(php artisan:*)",
+      "Bash(mysql -u root dogday_manager -e \"DROP TABLE IF EXISTS attendances, dogs, owners;\")",
+      "Bash(mysql:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
