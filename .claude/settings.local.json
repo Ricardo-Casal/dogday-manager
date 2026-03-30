@@ -13,7 +13,12 @@
       "Bash(php artisan:*)",
       "Bash(mysql -u root dogday_manager -e \"DROP TABLE IF EXISTS attendances, dogs, owners;\")",
       "Bash(mysql:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git push:*)",
+      "Bash(git remote:*)",
+      "Bash(gh auth:*)",
+      "Bash(ls:*)",
+      "Bash(git -c credential.helper='!f\\(\\) { echo \"\"username=Ricardo-Casal\"\"; echo \"\"password=$\\(gh auth token\\)\"\"; }; f' push)"
     ]
   }
 }
