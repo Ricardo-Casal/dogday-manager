@@ -27,4 +27,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Dog::class);
     }
+
+    public function payment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EasypayWebhookController;
 use App\Http\Controllers\Owner\BookingController as OwnerBookingController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+use App\Http\Controllers\Owner\PaymentController as OwnerPaymentController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staff\BookingController as StaffBookingController;
+use App\Http\Controllers\Staff\PaymentController as StaffPaymentController;
 use App\Http\Controllers\Staff\SettingController;
 use App\Http\Controllers\Staff\UserController as StaffUserController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// Easypay webhook (no CSRF, no auth)
+Route::post('/webhooks/easypay', [EasypayWebhookController::class, 'handle'])
+    ->name('webhooks.easypay')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Staff routes
 Route::middleware(['auth', 'verified', 'staff'])->group(function () {
@@ -35,6 +43,10 @@ Route::middleware(['auth', 'verified', 'staff'])->group(function () {
     Route::get('/staff/users/create', [StaffUserController::class, 'create'])->name('staff.users.create');
     Route::post('/staff/users', [StaffUserController::class, 'store'])->name('staff.users.store');
     Route::delete('/staff/users/{user}', [StaffUserController::class, 'destroy'])->name('staff.users.destroy');
+
+    Route::get('/staff/payments', [StaffPaymentController::class, 'index'])->name('staff.payments.index');
+    Route::post('/staff/payments/{booking}/generate', [StaffPaymentController::class, 'generate'])->name('staff.payments.generate');
+    Route::post('/staff/payments/{payment}/resend', [StaffPaymentController::class, 'resend'])->name('staff.payments.resend');
 });
 
 // Owner routes
@@ -42,6 +54,9 @@ Route::middleware(['auth', 'verified', 'owner'])->prefix('owner')->name('owner.'
     Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/bookings/create', [OwnerBookingController::class, 'create'])->name('bookings.create');
     Route::post('/bookings', [OwnerBookingController::class, 'store'])->name('bookings.store');
+
+    Route::get('/payments', [OwnerPaymentController::class, 'index'])->name('payments.index');
+    Route::post('/payments/{payment}/resend', [OwnerPaymentController::class, 'resend'])->name('payments.resend');
 });
 
 // Profile (both roles)
