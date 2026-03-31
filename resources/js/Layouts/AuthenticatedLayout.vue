@@ -47,6 +47,9 @@ const showingNavigationDropdown = ref(false);
                                     <NavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">
                                         Preços
                                     </NavLink>
+                                    <NavLink :href="route('staff.payments.index')" :active="route().current('staff.payments.*')">
+                                        Pagamentos
+                                    </NavLink>
                                     <NavLink :href="route('staff.users.index')" :active="route().current('staff.users.*')">
                                         Utilizadores
                                     </NavLink>
@@ -58,6 +61,9 @@ const showingNavigationDropdown = ref(false);
                                     </NavLink>
                                     <NavLink :href="route('owner.bookings.create')" :active="route().current('owner.bookings.*')">
                                         Novo Pedido
+                                    </NavLink>
+                                    <NavLink :href="route('owner.payments.index')" :active="route().current('owner.payments.*')">
+                                        Pagamentos
                                     </NavLink>
                                 </template>
                             </div>
@@ -166,11 +172,13 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('owners.index')" :active="route().current('owners.*')">Donos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">Pedidos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">Preços</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('staff.payments.index')" :active="route().current('staff.payments.*')">Pagamentos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.users.index')" :active="route().current('staff.users.*')">Utilizadores</ResponsiveNavLink>
                         </template>
                         <template v-else>
                             <ResponsiveNavLink :href="route('owner.dashboard')" :active="route().current('owner.dashboard')">A minha área</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('owner.bookings.create')" :active="route().current('owner.bookings.*')">Novo Pedido</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('owner.payments.index')" :active="route().current('owner.payments.*')">Pagamentos</ResponsiveNavLink>
                         </template>
                     </div>
 
