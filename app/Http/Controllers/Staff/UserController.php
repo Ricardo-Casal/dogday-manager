@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\Owner;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,12 +33,20 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        User::create([
+        $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'staff',
+            'role'     => $request->input('role', 'staff'),
         ]);
+
+        // Auto-link to owner if email matches
+        if ($user->role === 'owner') {
+            $owner = Owner::where('email', $user->email)->whereNull('user_id')->first();
+            if ($owner) {
+                $owner->update(['user_id' => $user->id]);
+            }
+        }
 
         return redirect()->route('staff.users.index');
     }

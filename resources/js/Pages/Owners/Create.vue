@@ -2,11 +2,16 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
+const props = defineProps({
+    availableUsers: Array,
+});
+
 const form = useForm({
     name: '',
     phone: '',
     email: '',
     notes: '',
+    user_id: '',
     dogs: [],
 });
 
@@ -58,6 +63,19 @@ function submit() {
                                 <textarea v-model="form.notes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Conta de acesso -->
+                    <div class="rounded-lg bg-white p-6 shadow-sm">
+                        <h3 class="mb-3 text-lg font-medium text-gray-900">Conta de Acesso</h3>
+                        <p class="mb-3 text-sm text-gray-500">Opcional — liga este dono a uma conta de utilizador. Se o email coincidir, a ligação é feita automaticamente.</p>
+                        <select v-model="form.user_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                            <option value="">— Sem conta associada —</option>
+                            <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+                                {{ user.name }} ({{ user.email }})
+                            </option>
+                        </select>
+                        <p v-if="form.errors.user_id" class="mt-1 text-sm text-red-600">{{ form.errors.user_id }}</p>
                     </div>
 
                     <!-- Dogs -->
