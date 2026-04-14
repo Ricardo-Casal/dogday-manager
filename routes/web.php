@@ -43,7 +43,12 @@ Route::middleware(['auth', 'verified', 'staff'])->group(function () {
     Route::get('/staff/users', [StaffUserController::class, 'index'])->name('staff.users.index');
     Route::get('/staff/users/create', [StaffUserController::class, 'create'])->name('staff.users.create');
     Route::post('/staff/users', [StaffUserController::class, 'store'])->name('staff.users.store');
+    Route::get('/staff/users/{user}', [StaffUserController::class, 'show'])->name('staff.users.show');
+    Route::patch('/staff/users/{user}', [StaffUserController::class, 'update'])->name('staff.users.update');
+    Route::patch('/staff/users/{user}/promote', [StaffUserController::class, 'promote'])->name('staff.users.promote');
     Route::delete('/staff/users/{user}', [StaffUserController::class, 'destroy'])->name('staff.users.destroy');
+    Route::post('/staff/users/{user}/dogs', [StaffUserController::class, 'addDog'])->name('staff.users.dogs.store');
+    Route::delete('/staff/users/{user}/dogs/{dog}', [StaffUserController::class, 'removeDog'])->name('staff.users.dogs.destroy');
 
     Route::get('/staff/payments', [StaffPaymentController::class, 'index'])->name('staff.payments.index');
     Route::post('/staff/payments/{booking}/generate', [StaffPaymentController::class, 'generate'])->name('staff.payments.generate');

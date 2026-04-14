@@ -38,9 +38,6 @@ const showingNavigationDropdown = ref(false);
                                     <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                         Dashboard
                                     </NavLink>
-                                    <NavLink :href="route('owners.index')" :active="route().current('owners.*')">
-                                        Donos
-                                    </NavLink>
                                     <NavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">
                                         Pedidos
                                     </NavLink>
@@ -169,7 +166,6 @@ const showingNavigationDropdown = ref(false);
                     <div class="space-y-1 pb-3 pt-2">
                         <template v-if="$page.props.auth.role === 'staff'">
                             <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Dashboard</ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('owners.index')" :active="route().current('owners.*')">Donos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">Pedidos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">Preços</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.payments.index')" :active="route().current('staff.payments.*')">Pagamentos</ResponsiveNavLink>

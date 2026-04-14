@@ -1,4 +1,4 @@
-*.log
+*.logboas
 .DS_Store
 .env
 .claude

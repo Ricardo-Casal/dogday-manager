@@ -14,6 +14,10 @@ class PaymentController extends Controller
     {
         $owner = auth()->user()->owner;
 
+        if (!$owner) {
+            return Inertia::render('Owner/Payments/Index', ['payments' => []]);
+        }
+
         $payments = Payment::where('owner_id', $owner->id)
             ->with('booking.dog')
             ->latest()
