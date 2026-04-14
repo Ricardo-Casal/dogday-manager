@@ -15,8 +15,12 @@ class EnsureIsStaff
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->isStaff()) {
-            abort(403);
+        if (!$request->user()) {
+            return redirect()->route('login');
+        }
+
+        if (!$request->user()->isStaff()) {
+            return redirect()->route('owner.dashboard');
         }
 
         return $next($request);

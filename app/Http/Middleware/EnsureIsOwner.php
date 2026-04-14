@@ -15,8 +15,12 @@ class EnsureIsOwner
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->isOwner()) {
-            abort(403);
+        if (!$request->user()) {
+            return redirect()->route('login');
+        }
+
+        if (!$request->user()->isOwner()) {
+            return redirect()->route('dashboard');
         }
 
         return $next($request);
