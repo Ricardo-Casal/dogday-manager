@@ -9,6 +9,9 @@ php artisan view:cache
 echo "==> Running migrations..."
 php artisan migrate --force
 
+echo "==> Seeding database..."
+php artisan db:seed --force
+
 echo "==> Creating storage link..."
 php artisan storage:link || true
 
