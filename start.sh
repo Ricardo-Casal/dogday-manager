@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+echo "==> Clearing caches..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
+
 echo "==> Caching config, routes and views..."
 php artisan config:cache
 php artisan route:cache
