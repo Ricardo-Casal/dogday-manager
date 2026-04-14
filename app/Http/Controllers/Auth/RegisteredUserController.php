@@ -33,26 +33,27 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'phone'    => 'nullable|string|max:50',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'owner',
+            'role'     => 'owner',
         ]);
 
         // Link to existing owner record by email, or create a new one
         $owner = Owner::firstOrCreate(
             ['email' => $request->email],
-            ['name' => $request->name, 'user_id' => $user->id]
+            ['name' => $request->name, 'phone' => $request->phone, 'user_id' => $user->id]
         );
 
         if (!$owner->user_id) {
-            $owner->update(['user_id' => $user->id]);
+            $owner->update(['user_id' => $user->id, 'phone' => $owner->phone ?? $request->phone]);
         }
 
         event(new Registered($user));
