@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EasypayWebhookController;
 use App\Http\Controllers\Owner\BookingController as OwnerBookingController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+use App\Http\Controllers\Owner\DogController as OwnerDogController;
 use App\Http\Controllers\Owner\PaymentController as OwnerPaymentController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
@@ -54,6 +55,9 @@ Route::middleware(['auth', 'verified', 'owner'])->prefix('owner')->name('owner.'
     Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/bookings/create', [OwnerBookingController::class, 'create'])->name('bookings.create');
     Route::post('/bookings', [OwnerBookingController::class, 'store'])->name('bookings.store');
+
+    Route::get('/dogs/create', [OwnerDogController::class, 'create'])->name('dogs.create');
+    Route::post('/dogs', [OwnerDogController::class, 'store'])->name('dogs.store');
 
     Route::get('/payments', [OwnerPaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments/{payment}/resend', [OwnerPaymentController::class, 'resend'])->name('payments.resend');

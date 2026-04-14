@@ -40,8 +40,11 @@ const freqLabel = { semanal: 'Semanal', quinzenal: 'Quinzenal', mensal: 'Mensal'
                 <!-- Dogs -->
                 <div class="rounded-lg bg-white p-6 shadow-sm">
                     <h3 class="mb-3 text-lg font-medium text-gray-900">Os meus cães</h3>
-                    <div v-if="!owner?.dogs?.length" class="text-sm text-gray-400">
-                        Ainda não tem cães registados. Contacte-nos para os adicionar.
+                    <div v-if="!owner?.dogs?.length" class="text-sm text-gray-400 flex items-center gap-3">
+                        <span>Ainda não tem cães registados.</span>
+                        <Link :href="route('owner.dogs.create')" class="text-indigo-600 hover:underline font-medium">
+                            + Adicionar o meu cão
+                        </Link>
                     </div>
                     <div v-else class="flex flex-wrap gap-3">
                         <div

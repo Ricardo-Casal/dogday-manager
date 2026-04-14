@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     owner: Object,
@@ -36,7 +36,21 @@ function submit() {
 
         <div class="py-8">
             <div class="mx-auto max-w-xl sm:px-6 lg:px-8">
-                <form @submit.prevent="submit" class="space-y-6">
+
+                <!-- No dogs warning -->
+                <div v-if="!owner?.dogs?.length" class="rounded-lg bg-yellow-50 border border-yellow-200 p-6 text-center">
+                    <p class="text-2xl mb-3">🐾</p>
+                    <p class="text-gray-700 font-medium mb-1">Ainda não tens nenhum cão registado.</p>
+                    <p class="text-sm text-gray-500 mb-4">Para fazer um pedido de reserva precisas de registar o teu patudo primeiro.</p>
+                    <Link
+                        :href="route('owner.dogs.create')"
+                        class="inline-block rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    >
+                        Registar o meu cão
+                    </Link>
+                </div>
+
+                <form v-else @submit.prevent="submit" class="space-y-6">
                     <div class="rounded-lg bg-white p-6 shadow-sm space-y-5">
 
                         <!-- Dog -->
