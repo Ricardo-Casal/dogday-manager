@@ -25,11 +25,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-pl
 # Install Node dependencies and build assets
 RUN npm ci && npm run build
 
-# Laravel optimizations
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
 # Storage permissions
 RUN chmod -R 775 storage bootstrap/cache
 
