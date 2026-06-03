@@ -34,23 +34,30 @@ class EasypayService
             ];
         }
 
-        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/mbway/v1/charge", [
-            'method'      => ['type' => 'MBW', 'phone' => "351#{$phone}"],
-            'type'        => 'sale',
-            'value'       => $amount,
-            'description' => $description,
-            'capture'     => ['descriptive' => $description],
+        // Normalise phone: strip spaces/dashes, ensure +351 prefix
+        $phone = preg_replace('/\s+|-/', '', $phone);
+        if (!str_starts_with($phone, '+')) {
+            $phone = '+351' . ltrim($phone, '0');
+        }
+
+        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
+            'type'     => 'sale',
+            'value'    => $amount,
+            'method'   => 'MBW',
+            'customer' => ['phone' => $phone],
+            'capture'  => ['descriptive' => $description],
         ]);
 
-        if ($response->successful()) {
+        if ($response->successful() && $response->json('status') === 'ok') {
             return [
                 'success'    => true,
                 'easypay_id' => $response->json('id'),
-                'status'     => $response->json('status'),
+                'status'     => 'pending',
             ];
         }
 
-        return ['success' => false, 'error' => $response->json('message', 'Erro ao criar pagamento MBWay')];
+        $msg = is_array($response->json('message')) ? implode(', ', $response->json('message')) : ($response->json('message') ?? 'Erro ao criar pagamento MBWay');
+        return ['success' => false, 'error' => $msg];
     }
 
     public function resendMBWay(string $easypayId): bool
@@ -60,7 +67,7 @@ class EasypayService
         }
 
         $response = Http::withHeaders($this->headers())
-            ->post("{$this->baseUrl}/mbway/v1/charge/{$easypayId}/resend");
+            ->post("{$this->baseUrl}/single/{$easypayId}/capture");
 
         return $response->successful();
     }
@@ -77,15 +84,14 @@ class EasypayService
             ];
         }
 
-        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/payment", [
-            'method'      => ['type' => 'MB'],
-            'type'        => 'sale',
-            'value'       => $amount,
-            'description' => $description,
-            'capture'     => ['descriptive' => $description],
+        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
+            'type'    => 'sale',
+            'value'   => $amount,
+            'method'  => 'MB',
+            'capture' => ['descriptive' => $description],
         ]);
 
-        if ($response->successful()) {
+        if ($response->successful() && $response->json('status') === 'ok') {
             return [
                 'success'      => true,
                 'easypay_id'   => $response->json('id'),
@@ -94,7 +100,8 @@ class EasypayService
             ];
         }
 
-        return ['success' => false, 'error' => $response->json('message', 'Erro ao criar referência Multibanco')];
+        $msg = is_array($response->json('message')) ? implode(', ', $response->json('message')) : ($response->json('message') ?? 'Erro ao criar referência Multibanco');
+        return ['success' => false, 'error' => $msg];
     }
 
     private function headers(): array
