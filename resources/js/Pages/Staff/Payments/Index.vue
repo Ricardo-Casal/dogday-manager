@@ -6,6 +6,7 @@ import { ref } from 'vue';
 const props = defineProps({
     owners: Array,
     isMock: Boolean,
+    isSandbox: Boolean,
 });
 
 const activeBooking = ref(null);
@@ -112,6 +113,17 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                         >
                                             Reenviar notificação MBWay
                                         </button>
+
+                                        <!-- Sandbox simulate button -->
+                                        <div v-if="isSandbox && booking.payment.status === 'pendente'" class="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 flex items-center justify-between">
+                                            <p class="text-xs text-amber-700">Simular pagamento (sandbox)</p>
+                                            <button
+                                                @click="router.post(route('staff.payments.simulate', booking.payment.id))"
+                                                class="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white hover:bg-amber-600"
+                                            >
+                                                Pagar agora
+                                            </button>
+                                        </div>
 
                                         <p v-if="booking.payment.status === 'pago'" class="mt-1 text-xs text-green-600">
                                             Pago em {{ booking.payment.paid_at }}

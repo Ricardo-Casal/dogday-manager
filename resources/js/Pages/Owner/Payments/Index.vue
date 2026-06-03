@@ -5,6 +5,7 @@ import { ref } from 'vue';
 
 defineProps({
     payments: Array,
+    isSandbox: Boolean,
 });
 
 const flash = usePage().props.flash;
@@ -143,6 +144,17 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                     </button>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Sandbox simulate button -->
+                        <div v-if="isSandbox && payment.status === 'pendente'" class="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-center justify-between">
+                            <p class="text-xs text-amber-700">Ambiente de teste — simular pagamento</p>
+                            <button
+                                @click="router.post(route('owner.payments.simulate', payment.id))"
+                                class="rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-600"
+                            >
+                                Pagar agora
+                            </button>
                         </div>
 
                         <p v-if="payment.status === 'pago'" class="mt-2 text-xs text-green-600">

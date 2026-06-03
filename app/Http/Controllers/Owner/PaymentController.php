@@ -25,7 +25,8 @@ class PaymentController extends Controller
             ->get();
 
         return Inertia::render('Owner/Payments/Index', [
-            'payments' => $payments,
+            'payments'   => $payments,
+            'isSandbox'  => config('services.easypay.sandbox', true),
         ]);
     }
 
@@ -51,8 +52,8 @@ class PaymentController extends Controller
             'mbway_phone' => 'required_if:method,mbway|nullable|string',
         ]);
 
-        // Cancel current payment
-        $payment->update(['status' => 'expirado']);
+        // Cancel all non-paid payments for this booking
+        Payment::where('booking_id', $payment->booking_id)->whereNotIn('status', ['pago'])->update(['status' => 'expirado']);
 
         $easypay  = app(EasypayService::class);
         $booking  = $payment->booking->load('dog');
@@ -82,5 +83,19 @@ class PaymentController extends Controller
         ]);
 
         return back()->with('success', 'Método de pagamento alterado.');
+    }
+
+    public function simulate(Payment $payment)
+    {
+        abort_unless(config('services.easypay.sandbox', true), 403, 'Apenas disponível em modo sandbox.');
+        abort_unless($payment->owner_id === auth()->user()->owner->id, 403);
+        abort_unless($payment->status === 'pendente', 422);
+
+        $payment->update([
+            'status'  => 'pago',
+            'paid_at' => now(),
+        ]);
+
+        return back();
     }
 }

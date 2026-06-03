@@ -24,8 +24,9 @@ class PaymentController extends Controller
           ->get();
 
         return Inertia::render('Staff/Payments/Index', [
-            'owners' => $owners,
-            'isMock' => empty(config('services.easypay.account_id')),
+            'owners'    => $owners,
+            'isMock'    => empty(config('services.easypay.account_id')),
+            'isSandbox' => config('services.easypay.sandbox', true),
         ]);
     }
 
@@ -37,7 +38,7 @@ class PaymentController extends Controller
         ]);
 
         // Cancel any existing pending payment for this booking
-        $booking->payment?->update(['status' => 'expirado']);
+        Payment::where('booking_id', $booking->id)->whereNotIn('status', ['pago'])->update(['status' => 'expirado']);
 
         $easypay  = app(EasypayService::class);
         $amount   = $this->calculateAmount($booking);
@@ -80,6 +81,19 @@ class PaymentController extends Controller
 
         $easypay = app(EasypayService::class);
         $easypay->resendMBWay($payment->easypay_id);
+
+        return back();
+    }
+
+    public function simulate(Payment $payment)
+    {
+        abort_unless(config('services.easypay.sandbox', true), 403, 'Apenas disponível em modo sandbox.');
+        abort_unless($payment->status === 'pendente', 422);
+
+        $payment->update([
+            'status'  => 'pago',
+            'paid_at' => now(),
+        ]);
 
         return back();
     }

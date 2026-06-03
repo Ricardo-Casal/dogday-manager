@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified', 'staff'])->group(function () {
     Route::get('/staff/payments', [StaffPaymentController::class, 'index'])->name('staff.payments.index');
     Route::post('/staff/payments/{booking}/generate', [StaffPaymentController::class, 'generate'])->name('staff.payments.generate');
     Route::post('/staff/payments/{payment}/resend', [StaffPaymentController::class, 'resend'])->name('staff.payments.resend');
+    Route::post('/staff/payments/{payment}/simulate', [StaffPaymentController::class, 'simulate'])->name('staff.payments.simulate');
 });
 
 // Owner routes
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'verified', 'owner'])->prefix('owner')->name('owner.'
     Route::get('/payments', [OwnerPaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments/{payment}/resend', [OwnerPaymentController::class, 'resend'])->name('payments.resend');
     Route::post('/payments/{payment}/change-method', [OwnerPaymentController::class, 'changeMethod'])->name('payments.change-method');
+    Route::post('/payments/{payment}/simulate', [OwnerPaymentController::class, 'simulate'])->name('payments.simulate');
 });
 
 // Profile (both roles)
