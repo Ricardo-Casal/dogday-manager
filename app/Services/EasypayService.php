@@ -41,11 +41,12 @@ class EasypayService
         }
 
         $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
-            'type'     => 'sale',
-            'value'    => $amount,
-            'method'   => 'MBW',
-            'customer' => ['phone' => $phone],
-            'capture'  => ['descriptive' => $description],
+            'type'         => 'sale',
+            'value'        => $amount,
+            'method'       => 'MBW',
+            'customer'     => ['phone' => $phone],
+            'capture'      => ['descriptive' => $description],
+            'notification' => ['url' => $this->notificationUrl()],
         ]);
 
         if ($response->successful() && $response->json('status') === 'ok') {
@@ -85,10 +86,11 @@ class EasypayService
         }
 
         $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
-            'type'    => 'sale',
-            'value'   => $amount,
-            'method'  => 'MB',
-            'capture' => ['descriptive' => $description],
+            'type'         => 'sale',
+            'value'        => $amount,
+            'method'       => 'MB',
+            'capture'      => ['descriptive' => $description],
+            'notification' => ['url' => $this->notificationUrl()],
         ]);
 
         if ($response->successful() && $response->json('status') === 'ok') {
@@ -107,9 +109,14 @@ class EasypayService
     private function headers(): array
     {
         return [
-            'AccountId' => $this->accountId,
-            'ApiKey'    => $this->apiKey,
+            'AccountId'    => $this->accountId,
+            'ApiKey'       => $this->apiKey,
             'Content-Type' => 'application/json',
         ];
+    }
+
+    private function notificationUrl(): string
+    {
+        return rtrim(config('app.url'), '/') . '/webhooks/easypay';
     }
 }
