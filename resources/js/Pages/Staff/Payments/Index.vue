@@ -120,13 +120,20 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                 </div>
 
                                 <!-- Generate payment button -->
-                                <div class="shrink-0">
+                                <div class="shrink-0 flex flex-col items-end gap-1">
                                     <button
                                         v-if="!booking.payment || ['expirado', 'falhado'].includes(booking.payment.status)"
                                         @click="activeBooking = booking.id"
                                         class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
                                     >
                                         Gerar Pagamento
+                                    </button>
+                                    <button
+                                        v-if="booking.payment?.status === 'pendente'"
+                                        @click="activeBooking = booking.id"
+                                        class="text-xs text-gray-400 hover:text-indigo-600 hover:underline"
+                                    >
+                                        Alterar método
                                     </button>
                                 </div>
                             </div>
