@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class EasypayWebhookController extends Controller
 {
     public function handle(Request $request): Response
     {
+        Log::info('Easypay webhook received', $request->all());
+
         $easypayId = $request->input('id');
 
         if (!$easypayId) {
