@@ -1,11 +1,18 @@
 #!/bin/bash
 set -e
 
+echo "==> Waiting for database..."
+until php artisan db:show --json > /dev/null 2>&1; do
+    echo "    DB not ready, retrying in 3s..."
+    sleep 3
+done
+echo "    DB is ready."
+
 echo "==> Clearing caches..."
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
-php artisan cache:clear
+php artisan cache:clear || true
 
 echo "==> Caching config, routes and views..."
 php artisan config:cache
