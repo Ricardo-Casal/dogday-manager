@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verified', 'owner'])->prefix('owner')->name('owner.'
 
     Route::get('/payments', [OwnerPaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments/{payment}/resend', [OwnerPaymentController::class, 'resend'])->name('payments.resend');
+    Route::post('/payments/{payment}/change-method', [OwnerPaymentController::class, 'changeMethod'])->name('payments.change-method');
 });
 
 // Profile (both roles)

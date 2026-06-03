@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineProps({
     payments: Array,
@@ -10,6 +11,21 @@ const flash = usePage().props.flash;
 
 function resend(payment) {
     router.post(route('owner.payments.resend', payment.id));
+}
+
+const changingPayment = ref(null);
+const changeForm = useForm({ method: 'multibanco', mbway_phone: '' });
+
+function openChange(payment) {
+    changingPayment.value = payment.id;
+    changeForm.method = 'multibanco';
+    changeForm.mbway_phone = '';
+}
+
+function submitChange(payment) {
+    changeForm.post(route('owner.payments.change-method', payment.id), {
+        onSuccess: () => { changingPayment.value = null; },
+    });
 }
 
 const statusColor = {
@@ -80,6 +96,53 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                             >
                                 Reenviar pedido MBWay
                             </button>
+                        </div>
+
+                        <!-- Change method -->
+                        <div v-if="['pendente', 'falhado'].includes(payment.status)" class="mt-3">
+                            <button
+                                v-if="changingPayment !== payment.id"
+                                @click="openChange(payment)"
+                                class="text-sm text-indigo-600 hover:underline"
+                            >
+                                Alterar método de pagamento
+                            </button>
+
+                            <div v-else class="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Escolha o novo método:</p>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" v-model="changeForm.method" value="multibanco" class="text-indigo-600" />
+                                        <span class="text-sm">Multibanco</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" v-model="changeForm.method" value="mbway" class="text-indigo-600" />
+                                        <span class="text-sm">MBWay</span>
+                                    </label>
+                                </div>
+                                <div v-if="changeForm.method === 'mbway'">
+                                    <label class="block text-sm font-medium text-gray-700">Nº de telemóvel</label>
+                                    <input
+                                        v-model="changeForm.mbway_phone"
+                                        type="text"
+                                        placeholder="9XXXXXXXX"
+                                        class="mt-1 block w-48 rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    />
+                                </div>
+                                <p v-if="changeForm.errors.payment" class="text-xs text-red-600">{{ changeForm.errors.payment }}</p>
+                                <div class="flex gap-2">
+                                    <button
+                                        @click="submitChange(payment)"
+                                        :disabled="changeForm.processing"
+                                        class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                                    >
+                                        Confirmar
+                                    </button>
+                                    <button @click="changingPayment = null" class="text-sm text-gray-500 hover:underline">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <p v-if="payment.status === 'pago'" class="mt-2 text-xs text-green-600">
