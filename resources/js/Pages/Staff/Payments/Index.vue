@@ -5,9 +5,15 @@ import { ref } from 'vue';
 
 const props = defineProps({
     owners: Array,
+    tab: String,
+    counts: Object,
     isMock: Boolean,
     isSandbox: Boolean,
 });
+
+function switchTab(key) {
+    router.get(route('staff.payments.index'), { tab: key }, { preserveState: false });
+}
 
 const activeBooking = ref(null);
 const forms = {};
@@ -55,8 +61,29 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
         <div class="py-8">
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
 
+                <!-- Tabs -->
+                <div class="flex gap-1 border-b border-gray-200">
+                    <button
+                        v-for="t in [{ key: 'pendente', label: 'Por pagar' }, { key: 'pago', label: 'Pagos' }]"
+                        :key="t.key"
+                        @click="switchTab(t.key)"
+                        :class="[
+                            'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors',
+                            tab === t.key
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ]"
+                    >
+                        {{ t.label }}
+                        <span v-if="counts[t.key]" :class="[
+                            'ml-1.5 rounded-full px-1.5 py-0.5 text-xs',
+                            tab === t.key ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'
+                        ]">{{ counts[t.key] }}</span>
+                    </button>
+                </div>
+
                 <div v-if="owners.length === 0" class="rounded-lg bg-white p-12 text-center shadow-sm text-gray-400">
-                    Não há reservas aprovadas com pagamentos pendentes.
+                    {{ tab === 'pago' ? 'Não há pagamentos realizados.' : 'Não há reservas com pagamentos pendentes.' }}
                 </div>
 
                 <div v-for="owner in owners" :key="owner.id" class="rounded-lg bg-white shadow-sm overflow-hidden">
