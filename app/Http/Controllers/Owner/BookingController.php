@@ -42,6 +42,8 @@ class BookingController extends Controller
             'frequency'  => 'required_if:type,atl|required_if:type,aula|required_if:type,integracao|nullable|in:semanal,quinzenal,mensal',
             'pet_taxi'   => 'boolean',
             'notes'      => 'nullable|string|max:1000',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time'   => 'nullable|date_format:H:i|after:start_time',
         ]);
 
         // Ensure the dog belongs to this owner

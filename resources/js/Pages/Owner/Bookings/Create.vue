@@ -18,6 +18,8 @@ const form = useForm({
     frequency:  'semanal',
     pet_taxi:   false,
     notes:      '',
+    start_time: '',
+    end_time:   '',
 });
 
 const isHotel        = computed(() => form.type === 'hotel');
@@ -274,6 +276,22 @@ function submit() {
                                     Pet Taxi (ida e volta)
                                 </label>
                                 <p class="text-xs text-gray-500 mt-0.5">Custo adicional: {{ prices.pet_taxi }}€</p>
+                            </div>
+                        </div>
+
+                        <!-- Times -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">
+                                    {{ form.type === 'atl' && form.pet_taxi ? 'Hora de recolha (Pet Taxi)' : 'Hora de início' }}
+                                </label>
+                                <input v-model="form.start_time" type="time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                                <p v-if="form.errors.start_time" class="mt-1 text-sm text-red-600">{{ form.errors.start_time }}</p>
+                            </div>
+                            <div v-if="form.type !== 'atl' && form.type !== 'hotel'">
+                                <label class="block text-sm font-medium text-gray-700">Hora de fim</label>
+                                <input v-model="form.end_time" type="time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                                <p v-if="form.errors.end_time" class="mt-1 text-sm text-red-600">{{ form.errors.end_time }}</p>
                             </div>
                         </div>
 

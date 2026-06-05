@@ -9,7 +9,7 @@ class Booking extends Model
 {
     protected $fillable = [
         'owner_id', 'dog_id', 'type', 'subtype', 'is_regular', 'start_date', 'end_date',
-        'frequency', 'pet_taxi', 'notes', 'status', 'staff_notes',
+        'frequency', 'pet_taxi', 'notes', 'status', 'staff_notes', 'start_time', 'end_time',
     ];
 
     protected $casts = [
