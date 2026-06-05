@@ -41,6 +41,9 @@ const showingNavigationDropdown = ref(false);
                                     <NavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">
                                         Pedidos
                                     </NavLink>
+                                    <NavLink :href="route('staff.schedule.index')" :active="route().current('staff.schedule.*')">
+                                        Horário
+                                    </NavLink>
                                     <NavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">
                                         Preços
                                     </NavLink>
@@ -167,6 +170,7 @@ const showingNavigationDropdown = ref(false);
                         <template v-if="$page.props.auth.role === 'staff'">
                             <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Dashboard</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.bookings.index')" :active="route().current('staff.bookings.*')">Pedidos</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('staff.schedule.index')" :active="route().current('staff.schedule.*')">Horário</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.settings.index')" :active="route().current('staff.settings.*')">Preços</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.payments.index')" :active="route().current('staff.payments.*')">Pagamentos</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('staff.users.index')" :active="route().current('staff.users.*')">Utilizadores</ResponsiveNavLink>

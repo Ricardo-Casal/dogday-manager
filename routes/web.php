@@ -11,6 +11,7 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staff\BookingController as StaffBookingController;
 use App\Http\Controllers\Staff\PaymentController as StaffPaymentController;
+use App\Http\Controllers\Staff\ScheduleController as StaffScheduleController;
 use App\Http\Controllers\Staff\SettingController;
 use App\Http\Controllers\Staff\UserController as StaffUserController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,8 @@ Route::middleware(['auth', 'verified', 'staff'])->group(function () {
     Route::delete('/staff/users/{user}', [StaffUserController::class, 'destroy'])->name('staff.users.destroy');
     Route::post('/staff/users/{user}/dogs', [StaffUserController::class, 'addDog'])->name('staff.users.dogs.store');
     Route::delete('/staff/users/{user}/dogs/{dog}', [StaffUserController::class, 'removeDog'])->name('staff.users.dogs.destroy');
+
+    Route::get('/staff/schedule', [StaffScheduleController::class, 'index'])->name('staff.schedule.index');
 
     Route::get('/staff/payments', [StaffPaymentController::class, 'index'])->name('staff.payments.index');
     Route::post('/staff/payments/{booking}/generate', [StaffPaymentController::class, 'generate'])->name('staff.payments.generate');
