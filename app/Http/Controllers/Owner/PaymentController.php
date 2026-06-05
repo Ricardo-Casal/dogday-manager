@@ -19,6 +19,21 @@ class PaymentController extends Controller
             return Inertia::render('Owner/Payments/Index', ['payments' => []]);
         }
 
+        // Sync pending payments with Easypay
+        $easypay = app(EasypayService::class);
+        Payment::where('owner_id', $owner->id)
+            ->where('status', 'pendente')
+            ->whereNotNull('easypay_id')
+            ->where('easypay_id', 'not like', 'mock-%')
+            ->each(function ($payment) use ($easypay) {
+                $status = $easypay->checkPaymentStatus($payment->easypay_id);
+                if ($status && $status !== $payment->status) {
+                    $update = ['status' => $status];
+                    if ($status === 'pago') $update['paid_at'] = now();
+                    $payment->update($update);
+                }
+            });
+
         $payments = Payment::where('owner_id', $owner->id)
             ->with('booking.dog')
             ->latest()

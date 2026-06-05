@@ -17,6 +17,8 @@ class PaymentController extends Controller
 {
     public function index(Request $request): Response
     {
+        $this->syncPendingPayments();
+
         $tab = $request->input('tab', 'pendente') === 'pago' ? 'pago' : 'pendente';
 
         if ($tab === 'pago') {
@@ -111,6 +113,31 @@ class PaymentController extends Controller
         $easypay->resendMBWay($payment->easypay_id);
 
         return back();
+    }
+
+    private function syncPendingPayments(): void
+    {
+        $pending = Payment::where('status', 'pendente')
+            ->whereNotNull('easypay_id')
+            ->where('easypay_id', 'not like', 'mock-%')
+            ->get();
+
+        if ($pending->isEmpty()) {
+            return;
+        }
+
+        $easypay = app(EasypayService::class);
+
+        foreach ($pending as $payment) {
+            $status = $easypay->checkPaymentStatus($payment->easypay_id);
+            if ($status && $status !== $payment->status) {
+                $update = ['status' => $status];
+                if ($status === 'pago') {
+                    $update['paid_at'] = now();
+                }
+                $payment->update($update);
+            }
+        }
     }
 
     public function check(Payment $payment)
