@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
     owner: Object,
@@ -9,17 +9,73 @@ const props = defineProps({
 });
 
 const form = useForm({
-    dog_id: '',
-    type: 'atl',
+    dog_id:     '',
+    type:       'atl',
+    subtype:    '',
+    is_regular: true,
     start_date: '',
-    end_date: '',
-    frequency: 'semanal',
-    pet_taxi: false,
-    notes: '',
+    end_date:   '',
+    frequency:  'semanal',
+    pet_taxi:   false,
+    notes:      '',
 });
 
-const isHotel = computed(() => form.type === 'hotel');
-const isRecurring = computed(() => form.type === 'atl' || form.type === 'aula');
+const isHotel      = computed(() => form.type === 'hotel');
+const isRecurring  = computed(() => ['atl', 'aula', 'integracao'].includes(form.type));
+const isPack       = computed(() => form.type === 'pack_creche');
+const isAula       = computed(() => form.type === 'aula');
+const needsRegular = computed(() => ['atl', 'hotel'].includes(form.type));
+
+const serviceTypes = [
+    { value: 'atl',         label: 'Creche (ATL)',  icon: '🏠' },
+    { value: 'hotel',       label: 'Hotel',         icon: '🌙' },
+    { value: 'integracao',  label: 'Integração',    icon: '🐾' },
+    { value: 'aula',        label: 'Treino',        icon: '🎓' },
+    { value: 'pack_creche', label: 'Pack Creche',   icon: '📦' },
+];
+
+const aulaSubtypes = [
+    { value: 'individual',               label: 'Individual (nas instalações)', price: () => props.prices.aula },
+    { value: 'domicilio',                label: 'A Domicílio',                  price: () => props.prices.aula_domicilio },
+    { value: 'grupo',                    label: 'Em Grupo',                     price: () => props.prices.aula_grupo },
+    { value: 'avaliacao_comportamental', label: 'Avaliação Comportamental',    price: () => props.prices.avaliacao_comportamental },
+];
+
+const packOptions = [
+    { value: '4',  sessions: 4,  price: () => props.prices.pack_4 },
+    { value: '5',  sessions: 5,  price: () => props.prices.pack_5 },
+    { value: '6',  sessions: 6,  price: () => props.prices.pack_6 },
+    { value: '8',  sessions: 8,  price: () => props.prices.pack_8 },
+    { value: '10', sessions: 10, price: () => props.prices.pack_10 },
+    { value: '12', sessions: 12, price: () => props.prices.pack_12 },
+    { value: '15', sessions: 15, price: () => props.prices.pack_15 },
+];
+
+const displayPrice = computed(() => {
+    switch (form.type) {
+        case 'atl':
+            return (form.is_regular ? props.prices.atl : props.prices.atl_nao_regular) + '€/dia';
+        case 'hotel':
+            return (form.is_regular ? props.prices.hotel_noite : props.prices.hotel_noite_nao_regular) + '€/noite';
+        case 'integracao':
+            return props.prices.integracao + '€/sessão';
+        case 'aula': {
+            const sub = aulaSubtypes.find(s => s.value === form.subtype) ?? aulaSubtypes[0];
+            return sub.price() + '€';
+        }
+        case 'pack_creche': {
+            if (!form.subtype) return '—';
+            const key = 'pack_' + form.subtype;
+            return props.prices[key] + '€';
+        }
+        default: return '—';
+    }
+});
+
+function onTypeChange() {
+    form.subtype = '';
+    if (form.type === 'aula') form.subtype = 'individual';
+}
 
 function submit() {
     form.post(route('owner.bookings.store'));
@@ -65,18 +121,80 @@ function submit() {
                             <p v-if="form.errors.dog_id" class="mt-1 text-sm text-red-600">{{ form.errors.dog_id }}</p>
                         </div>
 
-                        <!-- Type -->
+                        <!-- Service type -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de serviço *</label>
-                            <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
                                 <label
-                                    v-for="opt in [{ value: 'atl', label: 'ATL', price: prices.atl }, { value: 'hotel', label: 'Hotel', price: prices.hotel_noite + '/noite' }, { value: 'aula', label: 'Aula', price: prices.aula }]"
+                                    v-for="opt in serviceTypes"
                                     :key="opt.value"
                                     :class="['flex flex-col items-center rounded-lg border-2 p-3 cursor-pointer transition', form.type === opt.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300']"
                                 >
-                                    <input type="radio" v-model="form.type" :value="opt.value" class="sr-only" />
-                                    <span class="font-medium text-gray-900">{{ opt.label }}</span>
-                                    <span class="text-xs text-gray-500 mt-1">{{ opt.price }}€</span>
+                                    <input type="radio" v-model="form.type" :value="opt.value" class="sr-only" @change="onTypeChange" />
+                                    <span class="text-xl mb-1">{{ opt.icon }}</span>
+                                    <span class="text-xs font-medium text-gray-900 text-center">{{ opt.label }}</span>
+                                </label>
+                            </div>
+                            <p v-if="form.errors.type" class="mt-1 text-sm text-red-600">{{ form.errors.type }}</p>
+                        </div>
+
+                        <!-- Aula subtype -->
+                        <div v-if="isAula">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de treino *</label>
+                            <div class="space-y-2">
+                                <label
+                                    v-for="sub in aulaSubtypes"
+                                    :key="sub.value"
+                                    :class="['flex items-center justify-between rounded-lg border-2 p-3 cursor-pointer transition', form.subtype === sub.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300']"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" v-model="form.subtype" :value="sub.value" class="text-indigo-600" />
+                                        <span class="text-sm font-medium text-gray-900">{{ sub.label }}</span>
+                                    </div>
+                                    <span class="text-sm font-semibold text-indigo-700">{{ sub.price() }}€</span>
+                                </label>
+                            </div>
+                            <p v-if="form.errors.subtype" class="mt-1 text-sm text-red-600">{{ form.errors.subtype }}</p>
+                        </div>
+
+                        <!-- Pack sessions selector -->
+                        <div v-if="isPack">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Número de sessões *</label>
+                            <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                                <label
+                                    v-for="pack in packOptions"
+                                    :key="pack.value"
+                                    :class="['flex flex-col items-center rounded-lg border-2 p-2 cursor-pointer transition', form.subtype === pack.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300']"
+                                >
+                                    <input type="radio" v-model="form.subtype" :value="pack.value" class="sr-only" />
+                                    <span class="text-lg font-bold text-gray-900">{{ pack.sessions }}</span>
+                                    <span class="text-xs text-gray-500">{{ pack.price() }}€</span>
+                                </label>
+                            </div>
+                            <p v-if="form.errors.subtype" class="mt-1 text-sm text-red-600">{{ form.errors.subtype }}</p>
+                        </div>
+
+                        <!-- Regular / Não regular toggle (ATL and Hotel) -->
+                        <div v-if="needsRegular" class="rounded-lg bg-gray-50 p-4">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Frequência do cliente</p>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" :value="true" v-model="form.is_regular" class="text-indigo-600" />
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-800">Regular</span>
+                                        <span class="ml-2 text-xs text-indigo-700 font-semibold">
+                                            {{ form.type === 'atl' ? prices.atl : prices.hotel_noite }}€
+                                        </span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" :value="false" v-model="form.is_regular" class="text-indigo-600" />
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-800">Não Regular</span>
+                                        <span class="ml-2 text-xs text-indigo-700 font-semibold">
+                                            {{ form.type === 'atl' ? prices.atl_nao_regular : prices.hotel_noite_nao_regular }}€
+                                        </span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -97,7 +215,7 @@ function submit() {
                             </div>
                         </template>
 
-                        <!-- ATL / Aula -->
+                        <!-- Recurring (ATL / Aula / Integração) -->
                         <template v-if="isRecurring">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Data de início *</label>
@@ -116,12 +234,27 @@ function submit() {
                             </div>
                         </template>
 
+                        <!-- Pack start date -->
+                        <template v-if="isPack">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Data de início *</label>
+                                <input v-model="form.start_date" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                                <p v-if="form.errors.start_date" class="mt-1 text-sm text-red-600">{{ form.errors.start_date }}</p>
+                            </div>
+                        </template>
+
+                        <!-- Price summary -->
+                        <div class="rounded-lg bg-indigo-50 px-4 py-3 flex items-center justify-between">
+                            <span class="text-sm text-indigo-700">Preço estimado</span>
+                            <span class="text-base font-bold text-indigo-900">{{ displayPrice }}</span>
+                        </div>
+
                         <!-- Pet taxi -->
                         <div class="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
                             <input id="pet_taxi" v-model="form.pet_taxi" type="checkbox" class="mt-0.5 h-4 w-4 rounded text-indigo-600" />
                             <div>
                                 <label for="pet_taxi" class="text-sm font-medium text-gray-700 cursor-pointer">
-                                    Pet Taxi (recolha em casa)
+                                    Pet Taxi (ida e volta)
                                 </label>
                                 <p class="text-xs text-gray-500 mt-0.5">Custo adicional: {{ prices.pet_taxi }}€</p>
                             </div>

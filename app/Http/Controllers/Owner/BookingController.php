@@ -33,13 +33,15 @@ class BookingController extends Controller
         }
 
         $validated = $request->validate([
-            'dog_id'    => 'required|exists:dogs,id',
-            'type'      => 'required|in:atl,hotel,aula',
-            'start_date'=> 'required|date|after_or_equal:today',
-            'end_date'  => 'required_if:type,hotel|nullable|date|after:start_date',
-            'frequency' => 'required_if:type,atl|required_if:type,aula|nullable|in:semanal,quinzenal,mensal',
-            'pet_taxi'  => 'boolean',
-            'notes'     => 'nullable|string|max:1000',
+            'dog_id'     => 'required|exists:dogs,id',
+            'type'       => 'required|in:atl,hotel,aula,integracao,pack_creche',
+            'subtype'    => 'nullable|string|max:50',
+            'is_regular' => 'boolean',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date'   => 'required_if:type,hotel|nullable|date|after:start_date',
+            'frequency'  => 'required_if:type,atl|required_if:type,aula|required_if:type,integracao|nullable|in:semanal,quinzenal,mensal',
+            'pet_taxi'   => 'boolean',
+            'notes'      => 'nullable|string|max:1000',
         ]);
 
         // Ensure the dog belongs to this owner
@@ -47,8 +49,9 @@ class BookingController extends Controller
 
         $owner->bookings()->create([
             ...$validated,
-            'pet_taxi' => $request->boolean('pet_taxi'),
-            'status' => 'pendente',
+            'pet_taxi'   => $request->boolean('pet_taxi'),
+            'is_regular' => $request->boolean('is_regular', true),
+            'status'     => 'pendente',
         ]);
 
         return redirect()->route('owner.dashboard');

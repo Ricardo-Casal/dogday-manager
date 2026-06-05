@@ -174,12 +174,31 @@ class PaymentController extends Controller
     private function calculateAmount(Booking $booking): float
     {
         $settings = \App\Models\Setting::all()->keyBy('key');
-        $amount   = (float) ($settings[$booking->type]?->value ?? 0);
+        $regular  = $booking->is_regular ?? true;
 
-        if ($booking->type === 'hotel' && $booking->end_date && $booking->start_date) {
-            $nights = $booking->start_date->diffInDays($booking->end_date);
-            $amount = (float) ($settings['hotel_noite']?->value ?? 0) * max(1, $nights);
-        }
+        $amount = match($booking->type) {
+            'hotel' => (function () use ($booking, $settings, $regular) {
+                $key    = $regular ? 'hotel_noite' : 'hotel_noite_nao_regular';
+                $nightly = (float) ($settings[$key]?->value ?? 0);
+                $nights  = ($booking->end_date && $booking->start_date)
+                    ? max(1, $booking->start_date->diffInDays($booking->end_date))
+                    : 1;
+                return $nightly * $nights;
+            })(),
+            'atl' => (float) ($settings[$regular ? 'atl' : 'atl_nao_regular']?->value ?? 0),
+            'aula' => (function () use ($booking, $settings) {
+                $key = match($booking->subtype) {
+                    'domicilio'               => 'aula_domicilio',
+                    'grupo'                   => 'aula_grupo',
+                    'avaliacao_comportamental' => 'avaliacao_comportamental',
+                    default                   => 'aula',
+                };
+                return (float) ($settings[$key]?->value ?? 0);
+            })(),
+            'integracao'   => (float) ($settings['integracao']?->value ?? 0),
+            'pack_creche'  => (float) ($settings['pack_' . $booking->subtype]?->value ?? 0),
+            default        => 0.0,
+        };
 
         if ($booking->pet_taxi) {
             $amount += (float) ($settings['pet_taxi']?->value ?? 0);

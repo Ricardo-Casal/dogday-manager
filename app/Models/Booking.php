@@ -8,14 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Booking extends Model
 {
     protected $fillable = [
-        'owner_id', 'dog_id', 'type', 'start_date', 'end_date',
+        'owner_id', 'dog_id', 'type', 'subtype', 'is_regular', 'start_date', 'end_date',
         'frequency', 'pet_taxi', 'notes', 'status', 'staff_notes',
     ];
 
     protected $casts = [
         'start_date' => 'date',
-        'end_date' => 'date',
-        'pet_taxi' => 'boolean',
+        'end_date'   => 'date',
+        'pet_taxi'   => 'boolean',
+        'is_regular' => 'boolean',
     ];
 
     public function owner(): BelongsTo
