@@ -20,11 +20,12 @@ const form = useForm({
     notes:      '',
 });
 
-const isHotel      = computed(() => form.type === 'hotel');
-const isRecurring  = computed(() => ['atl', 'aula', 'integracao'].includes(form.type));
-const isPack       = computed(() => form.type === 'pack_creche');
-const isAula       = computed(() => form.type === 'aula');
-const needsRegular = computed(() => ['atl', 'hotel'].includes(form.type));
+const isHotel        = computed(() => form.type === 'hotel');
+const isRecurring    = computed(() => ['atl', 'aula', 'integracao'].includes(form.type));
+const isPack         = computed(() => form.type === 'pack_creche');
+const isAula         = computed(() => form.type === 'aula');
+const needsRegular   = computed(() => ['atl', 'hotel'].includes(form.type));
+const isSimpleDate   = computed(() => ['pet_sitting', 'dog_walking', 'banho'].includes(form.type));
 
 const serviceTypes = [
     { value: 'atl',         label: 'Creche (ATL)',  icon: '🏠' },
@@ -32,6 +33,9 @@ const serviceTypes = [
     { value: 'integracao',  label: 'Integração',    icon: '🐾' },
     { value: 'aula',        label: 'Treino',        icon: '🎓' },
     { value: 'pack_creche', label: 'Pack Creche',   icon: '📦' },
+    { value: 'pet_sitting', label: 'Pet Sitting',   icon: '🏡' },
+    { value: 'dog_walking', label: 'Dog Walking',   icon: '🦮' },
+    { value: 'banho',       label: 'Banho',         icon: '🛁' },
 ];
 
 const aulaSubtypes = [
@@ -68,6 +72,10 @@ const displayPrice = computed(() => {
             const key = 'pack_' + form.subtype;
             return props.prices[key] + '€';
         }
+        case 'pet_sitting':
+        case 'dog_walking':
+        case 'banho':
+            return props.prices[form.type] > 0 ? props.prices[form.type] + '€' : 'Sob consulta';
         default: return '—';
     }
 });
@@ -238,6 +246,15 @@ function submit() {
                         <template v-if="isPack">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Data de início *</label>
+                                <input v-model="form.start_date" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                                <p v-if="form.errors.start_date" class="mt-1 text-sm text-red-600">{{ form.errors.start_date }}</p>
+                            </div>
+                        </template>
+
+                        <!-- Pet Sitting / Dog Walking / Banho — just a date -->
+                        <template v-if="isSimpleDate">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Data pretendida *</label>
                                 <input v-model="form.start_date" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
                                 <p v-if="form.errors.start_date" class="mt-1 text-sm text-red-600">{{ form.errors.start_date }}</p>
                             </div>

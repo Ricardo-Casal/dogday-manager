@@ -36,7 +36,7 @@ const statusColor = {
     falhado:  'bg-red-100 text-red-800',
 };
 
-const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Integração', pack_creche: 'Pack Creche' };
+const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Integração', pack_creche: 'Pack Creche', pet_sitting: 'Pet Sitting', dog_walking: 'Dog Walking', banho: 'Banho' };
 </script>
 
 <template>

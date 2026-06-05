@@ -34,7 +34,7 @@ class BookingController extends Controller
 
         $validated = $request->validate([
             'dog_id'     => 'required|exists:dogs,id',
-            'type'       => 'required|in:atl,hotel,aula,integracao,pack_creche',
+            'type'       => 'required|in:atl,hotel,aula,integracao,pack_creche,pet_sitting,dog_walking,banho',
             'subtype'    => 'nullable|string|max:50',
             'is_regular' => 'boolean',
             'start_date' => 'required|date|after_or_equal:today',

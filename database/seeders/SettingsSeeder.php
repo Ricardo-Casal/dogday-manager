@@ -24,6 +24,11 @@ class SettingsSeeder extends Seeder
             ['key' => 'aula_grupo',               'label' => 'Treino em Grupo',                    'value' => 15.00],
             ['key' => 'avaliacao_comportamental', 'label' => 'Avaliação Comportamental',           'value' => 30.00],
 
+            // Outros serviços (sob consulta — manager define o preço)
+            ['key' => 'pet_sitting',  'label' => 'Pet Sitting (por dia)',  'value' => 0.00],
+            ['key' => 'dog_walking',  'label' => 'Dog Walking (por passeio)', 'value' => 0.00],
+            ['key' => 'banho',        'label' => 'Banho e Tosquia',        'value' => 0.00],
+
             // Packs mensais de creche
             ['key' => 'pack_4',  'label' => 'Pack Creche — 4 sessões',  'value' => 40.00],
             ['key' => 'pack_5',  'label' => 'Pack Creche — 5 sessões',  'value' => 50.00],

@@ -197,6 +197,9 @@ class PaymentController extends Controller
             })(),
             'integracao'   => (float) ($settings['integracao']?->value ?? 0),
             'pack_creche'  => (float) ($settings['pack_' . $booking->subtype]?->value ?? 0),
+            'pet_sitting'  => (float) ($settings['pet_sitting']?->value ?? 0),
+            'dog_walking'  => (float) ($settings['dog_walking']?->value ?? 0),
+            'banho'        => (float) ($settings['banho']?->value ?? 0),
             default        => 0.0,
         };
 
