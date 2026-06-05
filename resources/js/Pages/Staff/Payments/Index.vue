@@ -43,6 +43,11 @@ const statusColor = {
 };
 
 const typeLabel    = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Integração', pack_creche: 'Pack Creche', pet_sitting: 'Pet Sitting', dog_walking: 'Dog Walking', banho: 'Banho' };
+
+function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 const subtypeLabel = {
     individual: 'Individual', domicilio: 'Domicílio', grupo: 'Grupo',
     avaliacao_comportamental: 'Avaliação Comp.',
@@ -115,13 +120,13 @@ const subtypeLabel = {
                                     </div>
                                     <p class="text-sm text-gray-500">
                                         <template v-if="booking.type === 'hotel'">
-                                            {{ booking.start_date }} → {{ booking.end_date }}
+                                            {{ fmtDate(booking.start_date) }} → {{ fmtDate(booking.end_date) }}
                                         </template>
                                         <template v-else-if="booking.type === 'pack_creche'">
-                                            A partir de {{ booking.start_date }}
+                                            A partir de {{ fmtDate(booking.start_date) }}
                                         </template>
                                         <template v-else>
-                                            A partir de {{ booking.start_date }} · {{ booking.frequency }}
+                                            A partir de {{ fmtDate(booking.start_date) }} · {{ booking.frequency }}
                                         </template>
                                     </p>
 
@@ -171,7 +176,7 @@ const subtypeLabel = {
                                         </div>
 
                                         <p v-if="booking.payment.status === 'pago'" class="mt-1 text-xs text-green-600">
-                                            Pago em {{ booking.payment.paid_at }}
+                                            Pago em {{ fmtDate(booking.payment.paid_at) }}
                                         </p>
                                     </div>
                                 </div>

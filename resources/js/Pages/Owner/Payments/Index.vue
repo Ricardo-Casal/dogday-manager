@@ -37,6 +37,11 @@ const statusColor = {
 };
 
 const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Integração', pack_creche: 'Pack Creche', pet_sitting: 'Pet Sitting', dog_walking: 'Dog Walking', banho: 'Banho' };
+
+function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 </script>
 
 <template>
@@ -164,7 +169,7 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Int
                         </div>
 
                         <p v-if="payment.status === 'pago'" class="mt-2 text-xs text-green-600">
-                            Pago em {{ new Date(payment.paid_at).toLocaleDateString('pt-PT') }}
+                            Pago em {{ fmtDate(payment.paid_at) }}
                         </p>
                     </div>
                 </div>
