@@ -12,15 +12,24 @@ use Inertia\Response;
 
 class BookingController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $tab = $request->input('tab', 'pendente');
+        $tab = in_array($tab, ['pendente', 'aprovado', 'rejeitado']) ? $tab : 'pendente';
+
         $bookings = Booking::with('dog', 'owner')
-            ->orderByRaw("FIELD(status, 'pendente', 'aprovado', 'rejeitado')")
+            ->where('status', $tab)
             ->latest()
             ->get();
 
+        $counts = Booking::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         return Inertia::render('Staff/Bookings/Index', [
             'bookings' => $bookings,
+            'tab'      => $tab,
+            'counts'   => $counts,
         ]);
     }
 
@@ -34,7 +43,7 @@ class BookingController extends Controller
         $booking->update($validated);
         $booking->load('dog', 'owner');
 
-        $email = $booking->owner->email ?? $booking->owner->user?->email;
+        $email = $booking->owner?->email ?? $booking->owner?->user?->email;
 
         if ($email) {
             Mail::to($email)->send(new BookingStatusUpdated($booking));

@@ -1,40 +1,40 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     bookings: Array,
+    tab: String,
+    counts: Object,
 });
 
 const statusColor = {
-    pendente: 'bg-yellow-100 text-yellow-800',
-    aprovado: 'bg-green-100 text-green-800',
+    pendente:  'bg-yellow-100 text-yellow-800',
+    aprovado:  'bg-green-100 text-green-800',
     rejeitado: 'bg-red-100 text-red-800',
 };
 
 const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
 const freqLabel = { semanal: 'Semanal', quinzenal: 'Quinzenal', mensal: 'Mensal' };
 
+const tabs = [
+    { key: 'pendente',  label: 'Pendentes' },
+    { key: 'aprovado',  label: 'Aprovados' },
+    { key: 'rejeitado', label: 'Recusados' },
+];
+
+function switchTab(key) {
+    router.get(route('staff.bookings.index'), { tab: key }, { preserveState: false });
+}
+
 const activeForm = ref(null);
-
-function openForm(bookingId) {
-    activeForm.value = bookingId;
-}
-
-function getForm(booking) {
-    return useForm({
-        status: booking.status === 'pendente' ? 'aprovado' : booking.status,
-        staff_notes: booking.staff_notes ?? '',
-    });
-}
-
 const forms = {};
 
 function resolveForm(booking) {
     if (!forms[booking.id]) {
         forms[booking.id] = useForm({
-            status: 'aprovado',
+            status:      'aprovado',
             staff_notes: booking.staff_notes ?? '',
         });
     }
@@ -59,8 +59,30 @@ function submit(booking) {
 
         <div class="py-8">
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8">
+
+                <!-- Tabs -->
+                <div class="flex gap-1 mb-6 border-b border-gray-200">
+                    <button
+                        v-for="t in tabs"
+                        :key="t.key"
+                        @click="switchTab(t.key)"
+                        :class="[
+                            'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors',
+                            tab === t.key
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ]"
+                    >
+                        {{ t.label }}
+                        <span v-if="counts[t.key]" :class="[
+                            'ml-1.5 rounded-full px-1.5 py-0.5 text-xs',
+                            tab === t.key ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'
+                        ]">{{ counts[t.key] }}</span>
+                    </button>
+                </div>
+
                 <div v-if="bookings.length === 0" class="rounded-lg bg-white p-12 text-center shadow-sm text-gray-400">
-                    Não há pedidos de reserva.
+                    Não há pedidos {{ tab === 'pendente' ? 'pendentes' : tab === 'aprovado' ? 'aprovados' : 'recusados' }}.
                 </div>
 
                 <div v-else class="space-y-4">
@@ -75,6 +97,7 @@ function submit(booking) {
                                     <span class="font-semibold text-gray-900">{{ booking.dog.name }}</span>
                                     <span class="text-sm text-gray-500">de {{ booking.owner.name }}</span>
                                     <span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ typeLabel[booking.type] }}</span>
+                                    <span v-if="booking.pet_taxi" class="rounded bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700">Pet Taxi</span>
                                 </div>
                                 <p class="text-sm text-gray-500">
                                     <template v-if="booking.type === 'hotel'">
@@ -84,7 +107,6 @@ function submit(booking) {
                                         A partir de {{ booking.start_date }} · {{ freqLabel[booking.frequency] }}
                                     </template>
                                 </p>
-                                <p v-if="booking.pet_taxi" class="mt-1 text-xs text-indigo-600">Inclui Pet Taxi</p>
                                 <p v-if="booking.notes" class="mt-2 text-sm text-gray-500 italic">"{{ booking.notes }}"</p>
                                 <p v-if="booking.staff_notes" class="mt-1 text-sm text-gray-600">
                                     <span class="font-medium">Nota:</span> {{ booking.staff_notes }}
@@ -97,7 +119,7 @@ function submit(booking) {
                                 </span>
                                 <button
                                     v-if="booking.status === 'pendente'"
-                                    @click="openForm(booking.id)"
+                                    @click="activeForm = booking.id"
                                     class="text-sm text-indigo-600 hover:underline"
                                 >
                                     Responder
@@ -138,6 +160,7 @@ function submit(booking) {
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </AuthenticatedLayout>
