@@ -31,16 +31,10 @@ class PaymentController extends Controller
         } else {
             $owners = Owner::with([
                 'bookings' => fn($q) => $q->where('status', 'aprovado')
-                    ->where(fn($q) => $q
-                        ->doesntHave('payments')
-                        ->orWhereHas('payments', fn($q) => $q->whereIn('status', ['pendente', 'falhado', 'expirado']))
-                    )
+                    ->whereDoesntHave('payments', fn($q) => $q->where('status', 'pago'))
                     ->with('dog', 'payment'),
             ])->whereHas('bookings', fn($q) => $q->where('status', 'aprovado')
-                ->where(fn($q) => $q
-                    ->doesntHave('payments')
-                    ->orWhereHas('payments', fn($q) => $q->whereIn('status', ['pendente', 'falhado', 'expirado']))
-                ))
+                ->whereDoesntHave('payments', fn($q) => $q->where('status', 'pago')))
               ->orderBy('name')
               ->get();
         }
@@ -49,9 +43,10 @@ class PaymentController extends Controller
         $owners = $owners->filter(fn($o) => $o->bookings->isNotEmpty())->values();
 
         $counts = [
-            'pendente' => Payment::whereIn('status', ['pendente', 'falhado', 'expirado'])->count()
-                + Booking::where('status', 'aprovado')->doesntHave('payments')->count(),
-            'pago'     => Payment::where('status', 'pago')->count(),
+            'pendente' => Booking::where('status', 'aprovado')
+                ->whereDoesntHave('payments', fn($q) => $q->where('status', 'pago'))->count(),
+            'pago'     => Booking::where('status', 'aprovado')
+                ->whereHas('payments', fn($q) => $q->where('status', 'pago'))->count(),
         ];
 
         return Inertia::render('Staff/Payments/Index', [

@@ -40,14 +40,19 @@ class EasypayService
             $phone = '+351' . ltrim($phone, '0');
         }
 
-        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
-            'type'         => 'sale',
-            'value'        => $amount,
-            'method'       => 'MBW',
-            'customer'     => ['phone' => $phone],
-            'capture'      => ['descriptive' => $description],
-            'notification' => ['url' => $this->notificationUrl()],
-        ]);
+        $payload = [
+            'type'     => 'sale',
+            'value'    => $amount,
+            'method'   => 'MBW',
+            'customer' => ['phone' => $phone],
+            'capture'  => ['descriptive' => $description],
+        ];
+
+        if (!$this->isSandbox()) {
+            $payload['notification'] = ['url' => $this->notificationUrl()];
+        }
+
+        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", $payload);
 
         if ($response->successful() && $response->json('status') === 'ok') {
             return [
@@ -85,13 +90,18 @@ class EasypayService
             ];
         }
 
-        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", [
-            'type'         => 'sale',
-            'value'        => $amount,
-            'method'       => 'MB',
-            'capture'      => ['descriptive' => $description],
-            'notification' => ['url' => $this->notificationUrl()],
-        ]);
+        $payload = [
+            'type'    => 'sale',
+            'value'   => $amount,
+            'method'  => 'MB',
+            'capture' => ['descriptive' => $description],
+        ];
+
+        if (!$this->isSandbox()) {
+            $payload['notification'] = ['url' => $this->notificationUrl()];
+        }
+
+        $response = Http::withHeaders($this->headers())->post("{$this->baseUrl}/single", $payload);
 
         if ($response->successful() && $response->json('status') === 'ok') {
             return [
@@ -113,6 +123,11 @@ class EasypayService
             'ApiKey'       => $this->apiKey,
             'Content-Type' => 'application/json',
         ];
+    }
+
+    private function isSandbox(): bool
+    {
+        return (bool) config('services.easypay.sandbox', true);
     }
 
     private function notificationUrl(): string

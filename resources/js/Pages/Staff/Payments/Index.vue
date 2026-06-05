@@ -170,7 +170,7 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                     <button
                                         v-if="booking.payment?.status === 'pendente'"
                                         @click="activeBooking = booking.id"
-                                        class="text-xs text-gray-400 hover:text-indigo-600 hover:underline"
+                                        class="text-xs text-indigo-500 hover:text-indigo-700 hover:underline font-medium"
                                     >
                                         Alterar método
                                     </button>
