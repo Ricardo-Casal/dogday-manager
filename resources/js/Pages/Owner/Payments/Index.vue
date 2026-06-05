@@ -83,6 +83,12 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                 </div>
                             </div>
                             <p class="text-xs text-blue-700 mt-2">Valor: <strong>{{ payment.amount }}€</strong></p>
+                            <button
+                                @click="router.post(route('owner.payments.check', payment.id))"
+                                class="mt-3 text-sm text-blue-700 hover:underline font-medium"
+                            >
+                                Já paguei — verificar estado
+                            </button>
                         </div>
 
                         <!-- MBWay -->

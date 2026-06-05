@@ -113,6 +113,24 @@ class PaymentController extends Controller
         return back();
     }
 
+    public function check(Payment $payment)
+    {
+        abort_unless($payment->status === 'pendente', 422);
+
+        $easypay = app(EasypayService::class);
+        $status  = $easypay->checkPaymentStatus($payment->easypay_id);
+
+        if ($status && $status !== $payment->status) {
+            $update = ['status' => $status];
+            if ($status === 'pago') {
+                $update['paid_at'] = now();
+            }
+            $payment->update($update);
+        }
+
+        return back();
+    }
+
     public function simulate(Payment $payment)
     {
         abort_unless(config('services.easypay.sandbox', true), 403, 'Apenas disponível em modo sandbox.');

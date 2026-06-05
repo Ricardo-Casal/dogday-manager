@@ -126,10 +126,18 @@ const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
                                         </div>
 
                                         <!-- Multibanco reference -->
-                                        <div v-if="booking.payment.method === 'multibanco' && booking.payment.status === 'pendente'" class="mt-2 rounded bg-gray-50 px-3 py-2 text-sm">
-                                            <span class="text-gray-500">Entidade:</span> <strong>{{ booking.payment.mb_entity }}</strong>
-                                            &nbsp;·&nbsp;
-                                            <span class="text-gray-500">Referência:</span> <strong>{{ booking.payment.mb_reference }}</strong>
+                                        <div v-if="booking.payment.method === 'multibanco' && booking.payment.status === 'pendente'" class="mt-2 rounded bg-gray-50 px-3 py-2 text-sm flex items-center justify-between gap-4">
+                                            <div>
+                                                <span class="text-gray-500">Entidade:</span> <strong>{{ booking.payment.mb_entity }}</strong>
+                                                &nbsp;·&nbsp;
+                                                <span class="text-gray-500">Referência:</span> <strong>{{ booking.payment.mb_reference }}</strong>
+                                            </div>
+                                            <button
+                                                @click="router.post(route('staff.payments.check', booking.payment.id))"
+                                                class="shrink-0 text-xs text-indigo-600 hover:underline"
+                                            >
+                                                Verificar pagamento
+                                            </button>
                                         </div>
 
                                         <!-- MBWay resend -->

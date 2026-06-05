@@ -66,6 +66,27 @@ class EasypayService
         return ['success' => false, 'error' => $msg];
     }
 
+    public function checkPaymentStatus(string $easypayId): ?string
+    {
+        if ($this->isMock) {
+            return null;
+        }
+
+        $response = Http::withHeaders($this->headers())
+            ->get("{$this->baseUrl}/single/{$easypayId}");
+
+        if (!$response->successful()) {
+            return null;
+        }
+
+        return match($response->json('payment_status')) {
+            'paid'    => 'pago',
+            'expired' => 'expirado',
+            'error', 'failed' => 'falhado',
+            default   => null,
+        };
+    }
+
     public function resendMBWay(string $easypayId): bool
     {
         if ($this->isMock) {
