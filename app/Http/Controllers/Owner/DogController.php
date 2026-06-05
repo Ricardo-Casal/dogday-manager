@@ -18,7 +18,12 @@ class DogController extends Controller
     {
         $owner = auth()->user()->owner;
 
-        abort_unless($owner, 403);
+        if (!$owner) {
+            $owner = auth()->user()->owner()->create([
+                'name'  => auth()->user()->name,
+                'email' => auth()->user()->email,
+            ]);
+        }
 
         $validated = $request->validate([
             'name'      => 'required|string|max:255',

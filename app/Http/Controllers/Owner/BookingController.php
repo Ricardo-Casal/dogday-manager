@@ -25,6 +25,13 @@ class BookingController extends Controller
     {
         $owner = auth()->user()->owner;
 
+        if (!$owner) {
+            $owner = auth()->user()->owner()->create([
+                'name'  => auth()->user()->name,
+                'email' => auth()->user()->email,
+            ]);
+        }
+
         $validated = $request->validate([
             'dog_id'    => 'required|exists:dogs,id',
             'type'      => 'required|in:atl,hotel,aula',
