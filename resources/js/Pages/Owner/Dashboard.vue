@@ -12,8 +12,13 @@ const statusColor = {
     rejeitado: 'bg-red-100 text-red-800',
 };
 
-const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Aula' };
+const typeLabel = { atl: 'ATL', hotel: 'Hotel', aula: 'Treino', integracao: 'Integração', pack_creche: 'Pack Creche', pet_sitting: 'Pet Sitting', dog_walking: 'Dog Walking', banho: 'Banho' };
 const freqLabel = { semanal: 'Semanal', quinzenal: 'Quinzenal', mensal: 'Mensal' };
+
+function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 </script>
 
 <template>
@@ -77,18 +82,21 @@ const freqLabel = { semanal: 'Semanal', quinzenal: 'Quinzenal', mensal: 'Mensal'
                         >
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <div class="flex items-center gap-2 mb-1">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
                                         <span class="font-medium text-gray-900">{{ booking.dog.name }}</span>
-                                        <span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                                            {{ typeLabel[booking.type] }}
-                                        </span>
+                                        <span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ typeLabel[booking.type] }}</span>
+                                        <span v-if="['atl','hotel'].includes(booking.type) && booking.is_regular" class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">Cliente Regular</span>
+                                        <span v-if="['atl','hotel'].includes(booking.type) && !booking.is_regular" class="rounded bg-orange-100 px-2 py-0.5 text-xs text-orange-700">Não Regular</span>
                                     </div>
                                     <p class="text-sm text-gray-500">
                                         <template v-if="booking.type === 'hotel'">
-                                            {{ booking.start_date }} → {{ booking.end_date }}
+                                            {{ fmtDate(booking.start_date) }} → {{ fmtDate(booking.end_date) }}
+                                        </template>
+                                        <template v-else-if="booking.type === 'pack_creche'">
+                                            A partir de {{ fmtDate(booking.start_date) }}
                                         </template>
                                         <template v-else>
-                                            A partir de {{ booking.start_date }} · {{ freqLabel[booking.frequency] }}
+                                            A partir de {{ fmtDate(booking.start_date) }}<template v-if="booking.frequency"> · {{ freqLabel[booking.frequency] }}</template>
                                         </template>
                                     </p>
                                     <p v-if="booking.pet_taxi" class="mt-1 text-xs text-indigo-600">Inclui Pet Taxi</p>

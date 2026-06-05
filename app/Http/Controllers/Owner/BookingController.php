@@ -36,7 +36,6 @@ class BookingController extends Controller
             'dog_id'     => 'required|exists:dogs,id',
             'type'       => 'required|in:atl,hotel,aula,integracao,pack_creche,pet_sitting,dog_walking,banho',
             'subtype'    => 'nullable|string|max:50',
-            'is_regular' => 'boolean',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date'   => 'required_if:type,hotel|nullable|date|after:start_date',
             'frequency'  => 'required_if:type,atl|required_if:type,aula|required_if:type,integracao|nullable|in:semanal,quinzenal,mensal',
@@ -49,10 +48,16 @@ class BookingController extends Controller
         // Ensure the dog belongs to this owner
         abort_unless($owner->dogs()->where('id', $validated['dog_id'])->exists(), 403);
 
+        // Regular = dog had any approved service in the last 3 months
+        $isRegular = \App\Models\Booking::where('dog_id', $validated['dog_id'])
+            ->where('status', 'aprovado')
+            ->where('start_date', '>=', now()->subMonths(3))
+            ->exists();
+
         $owner->bookings()->create([
             ...$validated,
             'pet_taxi'   => $request->boolean('pet_taxi'),
-            'is_regular' => $request->boolean('is_regular', true),
+            'is_regular' => $isRegular,
             'status'     => 'pendente',
         ]);
 

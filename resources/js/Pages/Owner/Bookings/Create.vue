@@ -12,7 +12,6 @@ const form = useForm({
     dog_id:     '',
     type:       'atl',
     subtype:    '',
-    is_regular: true,
     start_date: '',
     end_date:   '',
     frequency:  'semanal',
@@ -26,7 +25,7 @@ const isHotel        = computed(() => form.type === 'hotel');
 const isRecurring    = computed(() => ['atl', 'aula', 'integracao'].includes(form.type));
 const isPack         = computed(() => form.type === 'pack_creche');
 const isAula         = computed(() => form.type === 'aula');
-const needsRegular   = computed(() => ['atl', 'hotel'].includes(form.type));
+const needsRegular   = computed(() => false); // regularity is auto-calculated server-side
 const isSimpleDate   = computed(() => ['pet_sitting', 'dog_walking', 'banho'].includes(form.type));
 
 const serviceTypes = [
@@ -60,9 +59,9 @@ const packOptions = [
 const displayPrice = computed(() => {
     switch (form.type) {
         case 'atl':
-            return (form.is_regular ? props.prices.atl : props.prices.atl_nao_regular) + '€/dia';
+            return props.prices.atl + '€/dia (regular) · ' + props.prices.atl_nao_regular + '€/dia (não regular)';
         case 'hotel':
-            return (form.is_regular ? props.prices.hotel_noite : props.prices.hotel_noite_nao_regular) + '€/noite';
+            return props.prices.hotel_noite + '€/noite (regular) · ' + props.prices.hotel_noite_nao_regular + '€/noite (não regular)';
         case 'integracao':
             return props.prices.integracao + '€/sessão';
         case 'aula': {

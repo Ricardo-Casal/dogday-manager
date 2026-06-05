@@ -62,9 +62,11 @@ function fmtDate(d) {
                     <div v-for="payment in payments" :key="payment.id" class="rounded-lg bg-white p-5 shadow-sm">
                         <div class="flex items-start justify-between">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
                                     <span class="font-medium text-gray-900">{{ payment.booking.dog.name }}</span>
                                     <span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ typeLabel[payment.booking.type] }}</span>
+                                    <span v-if="['atl','hotel'].includes(payment.booking.type) && payment.booking.is_regular" class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">Cliente Regular</span>
+                                    <span v-if="['atl','hotel'].includes(payment.booking.type) && !payment.booking.is_regular" class="rounded bg-orange-100 px-2 py-0.5 text-xs text-orange-700">Não Regular</span>
                                 </div>
                                 <p class="text-sm font-semibold text-gray-800">{{ payment.amount }}€</p>
                                 <p class="text-xs text-gray-400 mt-0.5">via {{ payment.method === 'mbway' ? 'MBWay' : 'Multibanco' }}</p>

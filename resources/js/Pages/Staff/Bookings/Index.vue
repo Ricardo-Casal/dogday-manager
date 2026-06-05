@@ -108,6 +108,7 @@ function submit(booking) {
                                     <span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ typeLabel[booking.type] }}</span>
                                     <span v-if="booking.subtype && booking.type === 'aula'" class="rounded bg-purple-100 px-2 py-0.5 text-xs text-purple-700">{{ subtypeLabel[booking.subtype] ?? booking.subtype }}</span>
                                     <span v-if="booking.subtype && booking.type === 'pack_creche'" class="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">{{ booking.subtype }} sessões</span>
+                                    <span v-if="['atl','hotel'].includes(booking.type) && booking.is_regular" class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">Regular</span>
                                     <span v-if="['atl','hotel'].includes(booking.type) && !booking.is_regular" class="rounded bg-orange-100 px-2 py-0.5 text-xs text-orange-700">Não Regular</span>
                                     <span v-if="booking.pet_taxi" class="rounded bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700">Pet Taxi</span>
                                 </div>

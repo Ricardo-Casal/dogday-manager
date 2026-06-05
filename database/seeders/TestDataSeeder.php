@@ -237,6 +237,98 @@ class TestDataSeeder extends Seeder
             'frequency'  => 'mensal',
         ]);
 
-        $this->command->info('Test data seeded: 7 owners, 13 dogs, 15 bookings.');
+        // ─── Clientes antigos (não regulares — último serviço há +3 meses) ────────
+        $oldClients = [
+            [
+                'user'  => ['name' => 'Hugo Martins',    'email' => 'hugo@testecaudafeliz.com'],
+                'owner' => ['phone' => '919 888 008'],
+                'dogs'  => [['name' => 'Pipas', 'breed' => 'Bulldog Francês', 'birthdate' => '2019-05-10']],
+            ],
+            [
+                'user'  => ['name' => 'Inês Sousa',      'email' => 'ines@testecaudafeliz.com'],
+                'owner' => ['phone' => '910 999 009'],
+                'dogs'  => [
+                    ['name' => 'Duque', 'breed' => 'Cocker Spaniel', 'birthdate' => '2018-11-20'],
+                    ['name' => 'Nina',  'breed' => 'Yorkshire',      'birthdate' => '2020-03-08'],
+                ],
+            ],
+            [
+                'user'  => ['name' => 'Jorge Fonseca',   'email' => 'jorge@testecaudafeliz.com'],
+                'owner' => ['phone' => '911 000 010'],
+                'dogs'  => [['name' => 'Tito', 'breed' => 'Dachshund', 'birthdate' => '2021-07-15']],
+            ],
+        ];
+
+        $oldOwners = [];
+        foreach ($oldClients as $d) {
+            $user = User::firstOrCreate(
+                ['email' => $d['user']['email']],
+                ['name' => $d['user']['name'], 'password' => $password, 'role' => 'owner']
+            );
+            $owner = Owner::firstOrCreate(
+                ['user_id' => $user->id],
+                ['name' => $d['user']['name'], 'email' => $d['user']['email'], 'phone' => $d['owner']['phone']]
+            );
+            $dogs = [];
+            foreach ($d['dogs'] as $dogData) {
+                $dogs[] = Dog::firstOrCreate(
+                    ['owner_id' => $owner->id, 'name' => $dogData['name']],
+                    ['breed' => $dogData['breed'], 'birthdate' => $dogData['birthdate']]
+                );
+            }
+            $oldOwners[] = ['owner' => $owner, 'dogs' => $dogs];
+        }
+
+        // Old bookings (5+ months ago) → estes cães ficam não regulares
+        $bookOld = function (Owner $owner, Dog $dog, array $attrs) {
+            Booking::firstOrCreate(
+                ['owner_id' => $owner->id, 'dog_id' => $dog->id, 'type' => $attrs['type'], 'start_date' => $attrs['start_date']],
+                array_merge([
+                    'status'     => 'aprovado',
+                    'is_regular' => false,
+                    'pet_taxi'   => false,
+                    'subtype'    => null,
+                    'frequency'  => null,
+                    'end_date'   => null,
+                    'notes'      => null,
+                ], $attrs)
+            );
+        };
+
+        // Hugo — Pipas (ATL, parou há 5 meses)
+        $bookOld($oldOwners[0]['owner'], $oldOwners[0]['dogs'][0], [
+            'type'       => 'atl',
+            'start_date' => now()->subMonths(5)->toDateString(),
+            'frequency'  => 'semanal',
+            'is_regular' => false,
+        ]);
+
+        // Inês — Duque (Hotel, há 4 meses)
+        $bookOld($oldOwners[1]['owner'], $oldOwners[1]['dogs'][0], [
+            'type'       => 'hotel',
+            'start_date' => now()->subMonths(4)->toDateString(),
+            'end_date'   => now()->subMonths(4)->addDays(3)->toDateString(),
+            'is_regular' => false,
+        ]);
+
+        // Inês — Nina (Treino, há 6 meses)
+        $bookOld($oldOwners[1]['owner'], $oldOwners[1]['dogs'][1], [
+            'type'       => 'aula',
+            'subtype'    => 'individual',
+            'start_date' => now()->subMonths(6)->toDateString(),
+            'frequency'  => 'quinzenal',
+            'is_regular' => false,
+        ]);
+
+        // Jorge — Tito (ATL + pet taxi, parou há 4 meses e meio)
+        $bookOld($oldOwners[2]['owner'], $oldOwners[2]['dogs'][0], [
+            'type'       => 'atl',
+            'start_date' => now()->subWeeks(19)->toDateString(),
+            'frequency'  => 'semanal',
+            'pet_taxi'   => true,
+            'is_regular' => false,
+        ]);
+
+        $this->command->info('Test data seeded: 10 owners, 16 dogs, 19 bookings (incl. 4 non-regular).');
     }
 }
